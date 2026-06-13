@@ -21,6 +21,7 @@ def product_create(request):
     else:
         form = ProductForm()
     return render(request, 'products/product_form.html', {'form': form, 'product': None})
+
 def product_update(request, pk):
     """Редактирование товара по его id (pk)"""
     product = get_object_or_404(Product, pk=pk)
@@ -31,7 +32,7 @@ def product_update(request, pk):
             return redirect('product_list')
     else:
         form = ProductForm(instance=product)
-        return render(request, 'products/product_form.html', {'form': form, 'product': product})
+    return render(request, 'products/product_form.html', {'form': form, 'product': product})
 
 def product_delete(request, pk):
     """Удаление товара с подтверждением"""
