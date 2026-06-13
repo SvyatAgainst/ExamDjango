@@ -36,13 +36,10 @@ python manage.py startapp --имя вашего приложения--
 
 > P.S. Валидацию проводить желательно со всеми типами полей в модели. Но после валидации очень важно писать эти строки:
 
-```
-
+``` python
 def save(self, *args, **kwargs):
-
-self.full_clean()
-
-super().save(*args, **kwargs)
+	self.full_clean()
+	super().save(*args, **kwargs)
 
 ```
 
@@ -82,6 +79,7 @@ python manage.py runserver 8000 ### Если не работает первый 
 
 ``` python
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
@@ -97,6 +95,11 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 pip install dotenv
 ```
 
+> Для выполнения окружения ещё важно выключить DEBUG, но желательно делать это в конце работы. Но тогда для этого нужно в ALLOWED_HOSTS указать все принимаемые подключения, иначе debug с false будет с ошибкой:
+``` python
+ALLOWED_HOSTS = ['*'] 
+```
+> ЕСЛИ ВЫ ВЫКЛЮЧАЕТЕ DEBUG, УДОСТОВЕРЬТЕСЬ, ЧТО У ВАС СОБРАНА СТАТИКА.
 ## Добавляем метрики
 
 Чтобы добавить метрики, нужно создать [файл метриков в приложении](https://github.com/SvyatAgainst/ExamDjango/blob/main/product/middleware.py). Файл метриков лежит в примере, но важно учитывать базовую структуру метрики:
@@ -192,7 +195,7 @@ class HealthCheckTest(TestCase):
         self.assertEqual(response.json(), {'status': 'ok'})
 ```
 
-Дальше нужно добавить url в [urls.py](https://github.com/SvyatAgainst/ExamDjango/blob/main/product/urls.py), который создаётся в продукте:
+Дальше нужно добавить url в [urls.py](https://github.com/SvyatAgainst/ExamDjango/blob/main/product/urls.py), который создаётся в приложении:
 
 ``` python
 from django.urls import path
@@ -204,7 +207,7 @@ urlpatterns = [
 ]
 ```
 
-> ВАЖНО! Если есть файл маршрутизации, его нужно включить в [маршрутизацию проекта](https://github.com/SvyatAgainst/ExamDjango/blob/main/exam/urls.py):
+> ВАЖНО! Если есть файл маршрутизации приложения, его нужно включить в [маршрутизацию проекта](https://github.com/SvyatAgainst/ExamDjango/blob/main/exam/urls.py):
 ``` python
 from django.contrib import admin
 from django.urls import path, include
@@ -226,3 +229,61 @@ python manage.py test
 
 # На 10 баллов нужно сделать Frontend часть проекта.
 
+Нужно создать папку [templates, в которой (желательно), добавить папку (имя проекта)](https://github.com/SvyatAgainst/ExamDjango/tree/main/product/templates/products), где будут лежать html страницы. Структура примерно такая:
+
+![alt структура проекта для html](image-1.png)
+
+Далее, создаём html страницы.
+> Подробно буду рассказывать только про написание шаблона и подключение его в другие html. А на последнее распишу views.
+
+> Для того чтобы писать html в VS code, желательно использовать расширение для удобства написания html кода - [HTML CSS support](https://marketplace.visualstudio.com/items?itemName=ecmel.vscode-html-css). Просто в расширениях введите в поисковике HTML CSS Support - а затем скачайте.
+![alt расширение для html кода](image.png)
+А также, используйте переключение с Django html на обычный html если нужно писать чистый html и наоборот. Этот переключатель находится в нижнем правом углу.
+
+![alt text](image-2.png)
+
+## Осталось написать сами [html страницы](https://github.com/SvyatAgainst/ExamDjango/tree/main/product/templates/products). Вот base.html, он общий для всех типов:
+
+``` html
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width-device-width, initial-scale=1.0">
+        <title>{% block title %}Управление товарами{% endblock %}</title>
+        <href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container mt-4">
+            {% block content %}{% endblock %}
+        </div>
+    </body>
+</html>
+```
+
+Если, вы решили сами написать шаблон, то вот ссылку на bootstrap, чтобы включить его в ваш шаблон: https://getbootstrap.com/
+
+Остальные html страницы пишутся с ссылкой на шаблон:
+
+``` django html
+{% extends 'папка_в_templates/base.html' %}
+{% block title %}Заголовок страницы{% endblock %}
+{% block content %}
+	ЗДЕСЬ НАХОДИТСЯ ОСНОВНАЯ ЧАСТЬ
+{% endblock %}
+```
+
+КЛЮЧЕВЫЕ НЮАНСЫ ПРИ НАПИСАНИИ СТРАНИЦ:
+
+``` django html
+<a href='{% url 'имя_url куда перенаправить' %}'>Название ссылки</a>
+
+<form method="post">
+	{% csrf_token %} <-- Для защиты данных -->
+	{{ form.as_p }} <-- Для отображения формы -->
+</form>
+
+<a href="..." class="btn btn-sm btn-danger/secondary/warning">...</a> <-- Стили
+```
+
+## После html-страниц, нужно написать forms.py, для этого [создаём файл в папке приложения forms.py]()
