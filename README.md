@@ -242,7 +242,7 @@ python manage.py test
 
 ![alt text](image-2.png)
 
-## Осталось написать сами [html страницы](https://github.com/SvyatAgainst/ExamDjango/tree/main/product/templates/products). Вот base.html, он общий для всех типов:
+Осталось написать сами [html страницы](https://github.com/SvyatAgainst/ExamDjango/tree/main/product/templates/products). Вот base.html, он общий для всех типов:
 
 ``` html
 <!DOCTYPE html>
@@ -286,4 +286,79 @@ python manage.py test
 <a href="..." class="btn btn-sm btn-danger/secondary/warning">...</a> <-- Стили
 ```
 
-## После html-страниц, нужно написать forms.py, для этого [создаём файл в папке приложения forms.py]()
+## После html-страниц, нужно написать forms.py, для этого [создаём файл в папке приложения forms.py](https://github.com/SvyatAgainst/ExamDjango/blob/main/product/forms.py). Важные моменты при написании формы:
+
+``` python django
+from django import forms ## ЭТО ВАЖНО
+form .models import * ## ЭТО ВАЖНО
+
+class "YourNameForm"(forms.ModelForm):
+	model = 'название вашей модели, на основе которого делается форма'
+	fields = ['все ваши аттрибуты', 'для формы', 'идут через запятую']
+	widgets = {
+		'имя аттрибута': forms.ИмяТипаДаных(attrs={'class':'form-control'}),
+	}
+### ИМЕНА АТТРИБУТОВ: 
+forms.NumberInput, forms.TextInput, forms.DateInput и другие...
+в attrs пишутся {'class':'form-control'} для стиля, но необязательно!
+```
+
+## Самая сложная часть - [views](https://github.com/SvyatAgainst/ExamDjango/blob/main/product/views.py)
+
+Важные моменты:
+``` python
+#Импорт библиотек
+from django.shortcuts import render, redirect, get_object_or_404 # ОБЯЗАТЕЛЬНО!
+from django.http import JsonResponse
+from .models import *
+from .forms import *
+```
+
+``` python
+# Чтобы управлять вводом пользователя
+def "name_func"(request):
+	if request.method == 'POST':
+		form = "NameYourForm"(request.POST)
+		if from.is_valid():
+			form.save()
+			return redirect("ваше перенаправление")
+	else:
+		form = "NameYourForm"()
+	return render("Отображение текущей страницы")
+```
+
+``` python
+# Чтобы управлять вводом пользователя от существующего объекта
+def "name_func"(request, pk):
+	variable = get_object_or_404("NameModel", pk=pk)
+	if request.method == 'POST':
+		form = "NameYourForm"(request.POST, instance=variable)
+		if from.is_valid():
+			form.save()
+			return redirect("ваше перенаправление")
+	else:
+		form = "NameYourForm"(instance=variable)
+	return render("Отображение текущей страницы")
+```
+
+``` python
+# НЕ ЗАБУДЬТЕ ПЕРЕДАВАТЬ КОНТЕКСТНЫЕ ДАННЫЕ НА СТРАНИЦУ ПРИ render
+return redirect(request, 'name_html_page.html', context={'key': 'value', ...})
+```
+
+## Заключительная часть - [обновление urls.py приложения](https://github.com/SvyatAgainst/ExamDjango/blob/main/product/urls.py).
+
+Важные моменты:
+``` python
+path('name_path/', views.name_your_func, name='name_func_url')
+```
+> ОЧЕНЬ ВАЖНО писать name='name_func_url', потому что это надо в html страницах.
+``` python
+<int:pk> - Если в url пути используется тип передаваемых данных (pk), то важно знать:
+	<'тип данных, который мы передаём' : 'имя переменной для передачи'>
+	
+Для экзамена с CRUD должна быть такая структура:
+	path('<int:pk/update>') - или path('<int:pk>/delete')
+```
+
+## На этом этапе заканчивается экзамен. Если все этапы выполнены успешно, то это оценивается на 10 баллов.
