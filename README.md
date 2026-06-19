@@ -361,4 +361,39 @@ path('name_path/', views.name_your_func, name='name_func_url')
 	path('<int:pk/update>') - или path('<int:pk>/delete')
 ```
 
+### ДЛЯ ВЫПОЛНЕНИЯ ЗАДАНИЯ С 404.
+
+Для выполнения этого задания нужно создать на главной директории папку templates и кинуть туда файл html страницы 404.html:
+
+``` html 404
+<!DOCKTYPE html>
+<html lang="ru">
+	<head>
+		<title>Страница не найдена</title>
+	</head>
+	<body>
+		<h1>УУУУУПС</h1>
+		<p>Страница не найдена</p>
+	</body>
+</html>
+```
+
+После этого нужно добавить глобальную папку templates в настройках settings.py:
+
+``` python
+TEMPLATES = [
+
+{
+
+'BACKEND': 'django.template.backends.django.DjangoTemplates',
+
+'DIRS': [ BASE_DIR / 'templates' ], # Здесь указывается папка
+
+'APP_DIRS': True,
+
+'OPTIONS': { ...
+```
+
+> Затем включить DEBUG=False, чтобы отображалась наша кастомная html-ка.
+
 ## На этом этапе заканчивается экзамен. Если все этапы выполнены успешно, то это оценивается на 10 баллов.
